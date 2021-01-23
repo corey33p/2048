@@ -3,8 +3,8 @@ import random
 
 class Game:
     def __init__(self,board=None):
+        self.console_print = True
         self.new_game(board)
-        self.print_board()
     def print_board(self):
         print("----------")
         print("move #" + str(self.number_of_moves))
@@ -12,6 +12,7 @@ class Game:
         print(str(self.board))
     def undo(self):
         self.board,self.previous_board = self.previous_board,self.board
+        if self.console_print: self.print_board()
     def new_game(self,board=None):
         if board is not None:
             assert np.all(board.shape == (4,4))
@@ -23,6 +24,7 @@ class Game:
         self.number_of_moves = 0
         self.score = 0
         self.previous_board = np.copy(self.board)
+        if self.console_print: self.print_board()
     def random_spawn(self):
         empty_spots = np.argwhere(self.board == 0)
         random_spot = random.choice(empty_spots)
@@ -84,7 +86,7 @@ class Game:
             self.previous_board = board_copy
             self.random_spawn()
             self.number_of_moves += 1
-            self.print_board()
+            if self.console_print: self.print_board()
     def consolidate(self,direction):
         print("consolidating")
         valid_direction = direction in ("up","right","down","left")
