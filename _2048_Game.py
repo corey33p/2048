@@ -6,13 +6,15 @@ class Game:
         self.console_print = True
         self.new_game(board)
     def print_board(self):
-        print("----------")
+        print("----------\n----------")
         print("move #" + str(self.number_of_moves))
         print("score: " + str(self.score))
         print(str(self.board))
     def undo(self):
         self.board,self.previous_board = self.previous_board,self.board
         if self.console_print: self.print_board()
+        self.number_of_moves -= 1
+        self.score = self.previous_score
     def new_game(self,board=None):
         if board is not None:
             assert np.all(board.shape == (4,4))
@@ -23,6 +25,7 @@ class Game:
             self.random_spawn()
         self.number_of_moves = 0
         self.score = 0
+        self.previous_score = 0
         self.previous_board = np.copy(self.board)
         if self.console_print: self.print_board()
     def random_spawn(self):
@@ -34,6 +37,7 @@ class Game:
             self.board[random_spot[0],random_spot[1]] = 2
     def move(self,direction):
         valid_direction = direction in ("up","right","down","left")
+        self.previous_score = self.score
         if valid_direction:
             if direction == "up":
                 move_direction = np.array([-1,0])
@@ -104,13 +108,12 @@ class Game:
                 else:
                     for row in range(4):
                         for col in range(2,-1,-1):
-                            # print("what up")
                             if self.board[row,col]==self.board[row,col+1]:
                                 if self.board[row,col] != 0:
                                     self.board[row,col+1] = np.sum(self.board[row,col]+self.board[row,col+1])
                                     self.score += self.board[row,col+1]
                                     self.board[row,col]=0
-                                    self.board[row,:col]=np.roll(self.board[row,:col],1,axis=0)
+                                    self.board[row,:col+1]=np.roll(self.board[row,:col+1],1,axis=0)
             else:
                 if direction == "up":
                     for col in range(4):
@@ -129,7 +132,7 @@ class Game:
                                     self.board[row+1,col] = np.sum(self.board[row,col]+self.board[row+1,col])
                                     self.score += self.board[row+1,col]
                                     self.board[row,col]=0
-                                    self.board[:row,col]=np.roll(self.board[:row,col],1,axis=0)
+                                    self.board[:row+1,col]=np.roll(self.board[:row+1,col],1,axis=0)
         # print("here")
 
 # game = Game()
@@ -151,4 +154,4 @@ class Game:
                        # [0,8,0,0]])
 # print("game.board:\n" + str(game.board))
 # game.move("up")
-# print("game.board:\n" + str(game.board))
+# print("game.board:\n" + str(game.board))6
